@@ -17,8 +17,8 @@ db.open(function(err, result) {
 
     assert(!err, "Error while opening the database: " + err);
 
-    var classCount = db.classes.length;
-    console.log("The databse has " + classCount + " classes.");
+    var originalClassCount = db.classes.length;
+    console.log("The database has " + originalClassCount + " classes.");
 
     db.command("CREATE CLASS " + className, function(err, results) {
 
@@ -26,27 +26,36 @@ db.open(function(err, result) {
             assert(!err, "Error while executing a CREATE CLASS command: " + (err.message || JSON.stringify(err)));
         }
 
-        assert.equal(results.length, 1, "The new class count should be returned.");
-        assert.equal(classCount, results[0] - 1, "The class count should have been incremented.");
-        // TODO check issue: https://github.com/gabipetrovay/node-orientdb/issues/81
-        //assert.equal(classCount, db.classes.length - 1, "The Db object classes has not been updated.");
+        db.reload(function(err) {
+            assert(!err, err);
 
-        console.log("Created class " + className);
-        console.log("The database has now " + results[0] + " classes.");
+            assert.equal(results.length, 1, "The new class count should be returned.");
+            assert.equal(db.classes.length, results[0], "The Db object classes has not been updated.");
 
-        db.command("DROP CLASS " + className, function(err, results) {
+            console.log("Created class " + className);
+            console.log("The database has now " + db.classes.length + " classes.");
 
-            if (err) {
-                assert(!err, "Error while executing a DROP CLASS command: " + (err.message || JSON.stringify(err)));
-            }
+            db.command("DROP CLASS " + className, function(err, results) {
 
-            assert.equal(results.length, 1, "The result should contain the boolean status of the DROP operation.");
-            // TODO check issue: https://github.com/gabipetrovay/node-orientdb/issues/81
-            //assert.equal(classCount, db.classes.length - 1, "The Db object classes has not been updated.");
- 
-            console.log("Dropped class " + className);
+                if (err) {
+                    assert(!err, "Error while executing a DROP CLASS command: " + (err.message || JSON.stringify(err)));
+                }
 
-            db.close();
+                assert.equal(results.length, 1, "The result should contain the boolean status of the DROP operation.");
+                assert(results[0], "Drop class should be successful, it wasn't")
+
+                console.log("Dropped class " + className);
+
+                db.reload(function(err) {
+                    assert(!err, err);
+
+                    assert.equal(originalClassCount, db.classes.length, "The Db object classes has not been updated.");
+
+                    console.log("The database has now " + db.classes.length + " classes.");
+
+                    db.close();
+                });
+            });
         });
     });
 });
