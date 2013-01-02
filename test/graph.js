@@ -1,4 +1,5 @@
 var assert = require("assert");
+var Step = require("step");
 
 var orient = require("../lib/orientdb"),
     GraphDb = orient.GraphDb,
@@ -11,36 +12,50 @@ var server = new Server(serverConfig);
 var graphdb = new GraphDb("temp", server, dbConfig);
 
 function createVertexes(graphdb, callback) {
-    graphdb.createVertex({ id: 0 }, function(err, rootNode) {
-        assert(!err, err);
-
-        graphdb.createVertex({ name: "first node" }, function(err, childNode) {
+    var rootNode, childNode;
+    Step(
+        function createRootVertex() {
+            graphdb.createVertex({ id: 0 }, this);
+        },
+        function createFirstVertex(err, root) {
             assert(!err, err);
 
-            graphdb.createEdge(rootNode, childNode, function(err, edge) {
-                assert(!err, err);
+            rootNode = root;
 
-                assert.equal(rootNode["out"][0], edge["@rid"]);
-                assert.equal(childNode["in"][0], edge["@rid"]);
+            graphdb.createVertex({ name: "first node" }, this);
+        },
+        function createEdgeFromRootToFirstVertex(err, child) {
+            assert(!err, err);
 
-                assert.equal(rootNode["@rid"], edge["out"]);
-                assert.equal(childNode["@rid"], edge["in"]);
+            childNode = child;
 
-                graphdb.createEdge(childNode, rootNode, { label: "child_of" }, function(err, edge) {
-                    assert(!err, err);
-                    graphdb.createEdge(childNode["@rid"], rootNode["@rid"], function(err, edge) {
-                        assert(!err, err);
-                        
-                        childNode["out"].push(edge["@rid"]);
-                        rootNode["in"].push(edge["@rid"]);
-                        
-                        callback(rootNode, childNode);
-                    });
-                });
+            graphdb.createEdge(rootNode, childNode, this);
+        },
+        function createEdgeFromFirstVertexToRoot(err, edge) {
+            assert(!err, err);
 
-            });
-        });
-    });
+            assert.equal(rootNode["out"][0], edge["@rid"]);
+            assert.equal(childNode["in"][0], edge["@rid"]);
+
+            assert.equal(rootNode["@rid"], edge["out"]);
+            assert.equal(childNode["@rid"], edge["in"]);
+
+            graphdb.createEdge(childNode, rootNode, { label: "child_of" }, this);
+        },
+        function createEdgeByRID(err, edge) {
+            assert(!err, err);
+
+            graphdb.createEdge(childNode["@rid"], rootNode["@rid"], this);
+        },
+        function pushEdgeRIDIntoVertexes(err, edge) {
+            assert(!err, err);
+
+            childNode["out"].push(edge["@rid"]);
+            rootNode["in"].push(edge["@rid"]);
+
+            callback(rootNode, childNode);
+        }
+    );
 }
 
 graphdb.open(function(err) {
@@ -52,63 +67,79 @@ graphdb.open(function(err) {
     assert.equal("OGraphEdge", graphdb.getClassByName("OGraphEdge").name);
     assert.equal("OGraphEdge", graphdb.getClassByName("E").name);
 
-    createVertexes(graphdb, function(rootNode, childNode) {
-        graphdb.getOutEdges(rootNode, function(err, outEdges) {
+    var rootNode, childNode;
+    Step(
+        function() {
+            createVertexes(graphdb, this);
+        },
+        function(root, child) {
+            rootNode = root;
+            childNode = child;
+            graphdb.getOutEdges(rootNode, this);
+        },
+        function(err, outEdges) {
             assert(!err);
 
             assert.equal(1, outEdges.length);
 
-            graphdb.getInVertex(outEdges[0], function(err, vertex) {
-                assert(!err);
+            graphdb.getInVertex(outEdges[0], this);
+        },
+        function(err, vertex) {
+            assert(!err, err);
 
-                assert.equal(childNode["@rid"], vertex["@rid"]);
+            assert.equal(childNode["@rid"], vertex["@rid"]);
 
-                graphdb.getInEdges(childNode, function(err, inEdges) {
-                    assert(!err);
+            graphdb.getInEdges(childNode, this);
+        },
+        function(err, inEdges) {
+            assert(!err);
 
-                    assert.equal(1, inEdges.length);
+            assert.equal(1, inEdges.length);
 
-                    graphdb.getOutVertex(inEdges[0], function(err, vertex) {
-                        assert(!err);
+            graphdb.getOutVertex(inEdges[0], this);
+        },
+        function(err, vertex) {
+            assert(!err);
 
-                        assert.equal(rootNode["@rid"], vertex["@rid"]);
+            assert.equal(rootNode["@rid"], vertex["@rid"]);
 
-                        graphdb.getOutEdges(childNode, function(err, outEdges) {
-                            assert(!err);
+            graphdb.getOutEdges(childNode, this);
+        },
+        function(err, outEdges) {
+            assert(!err);
 
-                            assert.equal(2, outEdges.length);
+            assert.equal(2, outEdges.length);
 
-                            graphdb.getOutEdges(childNode, "child_of", function(err, outEdges) {
-                                assert(!err);
-                                assert.equal(1, outEdges.length);
+            graphdb.getOutEdges(childNode, "child_of", this);
+        },
+        function(err, outEdges) {
+            assert(!err);
+            assert.equal(1, outEdges.length);
 
-                                graphdb.fromVertex(childNode).outVertexes("child_of", function(err, vertexes) {
-                                    assert(!err);
+            graphdb.fromVertex(childNode).outVertexes("child_of", this);
+        },
+        function(err, vertexes) {
+            assert(!err);
 
-                                    assert.equal(1, vertexes.length);
+            assert.equal(1, vertexes.length);
 
-                                    assert.equal(rootNode["@rid"], vertexes[0]["@rid"]);
+            assert.equal(rootNode["@rid"], vertexes[0]["@rid"]);
 
-                                    graphdb.fromVertex(childNode).outVertexes(function(err, vertexes) {
-                                        assert(!err);
+            graphdb.fromVertex(childNode).outVertexes(this);
+        },
+        function(err, vertexes) {
+            assert(!err);
 
-                                        assert.equal(2, vertexes.length);
+            assert.equal(2, vertexes.length);
 
-                                        graphdb.fromVertex(childNode).inVertexes(function(err, vertexes) {
-                                            assert(!err);
+            graphdb.fromVertex(childNode).inVertexes(this);
+        },
+        function(err, vertexes) {
+            assert(!err);
 
-                                            assert.equal(1, vertexes.length);
-                                            assert.equal(rootNode["@rid"], vertexes[0]["@rid"]);
+            assert.equal(1, vertexes.length);
+            assert.equal(rootNode["@rid"], vertexes[0]["@rid"]);
 
-                                            graphdb.close();
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            graphdb.close();
         });
-    });
 });
