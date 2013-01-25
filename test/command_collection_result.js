@@ -22,7 +22,7 @@ db.open(function(err, result) {
 
         assert.equal(results.length, 3, "Weren't there 3 users in this database?");
 
-        for (var i in results) {
+        for (var i = 0, l = results.length; i < l; ++i) {
             assert(_.isString(results[i]["@rid"]));
         }
 
