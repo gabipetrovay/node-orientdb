@@ -29,8 +29,9 @@ server.connect(function(err, sessionId) {
             db.open(function(err) {
 
                 assert(!err, err);
-
+                
                 var location = path.dirname(db.configuration.dataSegments[0].holeFile.path);
+                var segmentCount = db.configuration.dataSegments.length;
 
                 db.addDataSegment("test_create_drop_new_data_segment", location, function(err, segmentNumber) {
 
@@ -44,9 +45,10 @@ server.connect(function(err, sessionId) {
                         assert(!err, err);
 
                         assert(successful);
-                        assert.equal(db.configuration.dataSegments.length, 2);
-                        assert.equal(db.configuration.dataSegments[1].dataId, -1);
-                        assert.equal(db.configuration.dataSegments[1].dataName, "${STORAGE_PATH}/txlog.otx");
+                        // starting with Orient 1.4.0 there is an additional "index" segment with ID 1
+                        assert.equal(db.configuration.dataSegments.length, segmentCount);
+                        assert.equal(db.configuration.dataSegments[0].dataId, 0);
+                        assert.equal(db.configuration.dataSegments[0].dataName, "default");
 
                         db.close(function(err) {
 
