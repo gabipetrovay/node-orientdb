@@ -34,7 +34,7 @@ db.open(function(err) {
 
                 assert.equal(position.clusterPosition, firstUserRID.clusterPosition + 1);
                 assert.equal(position.dataSegmentId, userCluster.dataSegmentId);
-                assert.equal(position.dataSegmentPos, userCluster.id + 1);
+                assert.equal(position.dataSegmentPos, 5);
                 assert.equal(position.recordSize, 0);
                 assert.equal(position.recordVersion, 0);
 
@@ -50,7 +50,7 @@ db.open(function(err) {
 
                     assert.equal(position.clusterPosition, secondUserRID.clusterPosition - 1);
                     assert.equal(position.dataSegmentId, userCluster.dataSegmentId);
-                    assert.equal(position.dataSegmentPos, userCluster.id - 1);
+                    assert.equal(position.dataSegmentPos, 3);
                     assert.equal(position.recordSize, 0);
                     assert.equal(position.recordVersion, 0);
 
