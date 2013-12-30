@@ -26,7 +26,7 @@ function createVertexes(graphdb, callback) {
                 assert.equal(rootNode["@rid"], edge["out"]);
                 assert.equal(childNode["@rid"], edge["in"]);
 
-                graphdb.createEdge(childNode, rootNode, { label: "child_of" }, function(err, edge) {
+                graphdb.createEdge(childNode, rootNode, { name: "child_of" }, function(err, edge) {
                     assert(!err, err);
                     graphdb.createEdge(childNode["@rid"], rootNode["@rid"], function(err, edge) {
                         assert(!err, err);
@@ -47,10 +47,8 @@ graphdb.open(function(err) {
 
     assert(!err, "Error while opening the database: " + err);
 
-    assert.equal("OGraphVertex", graphdb.getClassByName("OGraphVertex").name);
-    assert.equal("OGraphVertex", graphdb.getClassByName("V").name);
-    assert.equal("OGraphEdge", graphdb.getClassByName("OGraphEdge").name);
-    assert.equal("OGraphEdge", graphdb.getClassByName("E").name);
+    assert.equal("V", graphdb.getClassByName("V").name);
+    assert.equal("E", graphdb.getClassByName("E").name);
 
     createVertexes(graphdb, function(rootNode, childNode) {
         graphdb.getOutEdges(rootNode, function(err, outEdges) {

@@ -33,11 +33,18 @@ db.open(function(err) {
                                 assert(!err, err);
 
                                 assert.equal(2, results.length);
+								
+								var rowIndices;
+								
+								if (results[0].rid.name == "john")
+									rowIndices = [0,1];
+								else
+									rowIndices = [1,0];
 
-                                assert.equal("john", results[0].rid.name);
-                                assert.equal("doe", results[0].rid.surname);
-                                assert.equal("john m", results[1].rid.name);
-                                assert.equal("smith", results[1].rid.surname);
+                                assert.equal("john", results[rowIndices[0]].rid.name);
+                                assert.equal("doe", results[rowIndices[0]].rid.surname);
+                                assert.equal("john m", results[rowIndices[1]].rid.name);
+                                assert.equal("smith", results[rowIndices[1]].rid.surname);
 
                                 db.command("DELETE FROM ClassWithIndex", function(err) {
                                     assert(!err, err);

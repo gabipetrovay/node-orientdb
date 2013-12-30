@@ -38,7 +38,7 @@ server.connect(function(err, sessionId) {
                     assert(!err, err);
 
                     assert.equal(db.configuration.dataSegments[segmentNumber].dataName, "test_create_drop_new_data_segment");
-                    assert.equal(db.configuration.dataSegments[segmentNumber].holeFile.path, path.join(location, "test_create_drop_new_data_segment.odh"));
+                    assert.equal(path.normalize(db.configuration.dataSegments[segmentNumber].holeFile.path), path.join(location, "test_create_drop_new_data_segment.odh"));
 
                     db.dropDataSegment("test_create_drop_new_data_segment", function(err, successful) {
 

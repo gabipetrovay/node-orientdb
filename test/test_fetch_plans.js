@@ -24,7 +24,7 @@ db.open(function(err) {
 
                 assert.equal("first", vertex.name);
 
-                assert.equal("first_to_second", vertex.out[0].label);
+                assert.equal("first_to_second", vertex.out[0].name);
                 assert.equal(first["@rid"], vertex.out[0].out);
                 assert.equal(second["@rid"], vertex.out[0].in);
 
@@ -36,13 +36,13 @@ db.open(function(err) {
 
                     assert.equal("first", vertex.name);
 
-                    assert.equal("first_to_second", vertex.out[0].label);
+                    assert.equal("first_to_second", vertex.out[0].name);
                     assert.equal(first["@rid"], vertex.out[0].out);
                     assert.equal("second", vertex.out[0].in.name);
                     assert.equal(first_to_second["@rid"], vertex.out[0].in.in[0]);
                     assert.equal(second_to_third["@rid"], vertex.out[0].in.out[0]);
 
-                    assert.equal("third_to_first", vertex.in[0].label);
+                    assert.equal("third_to_first", vertex.in[0].name);
                     assert.equal(first["@rid"], vertex.in[0].in);
                     assert.equal("third", vertex.in[0].out.name);
                     assert.equal(second_to_third["@rid"], vertex.in[0].out.in[0]);
@@ -88,25 +88,25 @@ db.open(function(err) {
 function assertVertexHierarchyIsComplete(vertex, first, first_to_second, second, second_to_third, third, third_to_first) {
     assert.equal("first", vertex.name);
 
-    assert.equal("first_to_second", vertex.out[0].label);
+    assert.equal("first_to_second", vertex.out[0].name);
     assert.equal("second", vertex.out[0].in.name);
     assert.equal(first_to_second["@rid"], vertex.out[0].in.in[0]);
-    assert.equal("second_to_third", vertex.out[0].in.out[0].label);
+    assert.equal("second_to_third", vertex.out[0].in.out[0].name);
     assert.equal(second["@rid"], vertex.out[0].in.out[0].out);
     assert.equal("third", vertex.out[0].in.out[0].in.name);
     assert.equal(second_to_third["@rid"], vertex.out[0].in.out[0].in.in[0]);
-    assert.equal("third_to_first", vertex.out[0].in.out[0].in.out[0].label);
+    assert.equal("third_to_first", vertex.out[0].in.out[0].in.out[0].name);
     assert.equal(third["@rid"], vertex.out[0].in.out[0].in.out[0].out);
     assert.equal(first["@rid"], vertex.out[0].in.out[0].in.out[0].in);
 
-    assert.equal("third_to_first", vertex.in[0].label);
+    assert.equal("third_to_first", vertex.in[0].name);
     assert.equal(first["@rid"], vertex.in[0].in);
     assert.equal("third", vertex.in[0].out.name);
-    assert.equal("second_to_third", vertex.in[0].out.in[0].label);
+    assert.equal("second_to_third", vertex.in[0].out.in[0].name);
     assert.equal(third["@rid"], vertex.in[0].out.in[0].in);
     assert.equal("second", vertex.in[0].out.in[0].out.name);
     assert.equal(second_to_third["@rid"], vertex.in[0].out.in[0].out.out[0]);
-    assert.equal("first_to_second", vertex.in[0].out.in[0].out.in[0].label);
+    assert.equal("first_to_second", vertex.in[0].out.in[0].out.in[0].name);
     assert.equal(second["@rid"], vertex.in[0].out.in[0].out.in[0].in);
     assert.equal(first["@rid"], vertex.in[0].out.in[0].out.in[0].out);
     assert.equal(third_to_first["@rid"], vertex.in[0].out.out[0]);
@@ -122,13 +122,13 @@ function prepareDatabase(callback) {
             db.createVertex({ name: "third" }, function(err, third) {
                 if (err) { return callback(err); }
 
-                db.createEdge(first, second, { label: "first_to_second" }, function(err, first_to_second) {
+                db.createEdge(first, second, { name: "first_to_second" }, function(err, first_to_second) {
                     if (err) { return callback(err); }
 
-                    db.createEdge(second, third, { label: "second_to_third" }, function(err, second_to_third) {
+                    db.createEdge(second, third, { name: "second_to_third" }, function(err, second_to_third) {
                         if (err) { return callback(err); }
 
-                        db.createEdge(third, first, { label: "third_to_first" }, function(err, third_to_first) {
+                        db.createEdge(third, first, { name: "third_to_first" }, function(err, third_to_first) {
                             if (err) { return callback(err); }
 
                             callback(null, first, second, third, first_to_second, second_to_third, third_to_first);
