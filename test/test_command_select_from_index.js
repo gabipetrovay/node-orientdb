@@ -33,13 +33,13 @@ db.open(function(err) {
                                 assert(!err, err);
 
                                 assert.equal(2, results.length);
-								
-								var rowIndices;
-								
-								if (results[0].rid.name == "john")
-									rowIndices = [0,1];
-								else
-									rowIndices = [1,0];
+                                
+                                var rowIndices;
+                                
+                                if (results[0].rid.name == "john")
+                                    rowIndices = [0,1];
+                                else
+                                    rowIndices = [1,0];
 
                                 assert.equal("john", results[rowIndices[0]].rid.name);
                                 assert.equal("doe", results[rowIndices[0]].rid.surname);
