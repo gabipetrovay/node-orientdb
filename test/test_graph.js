@@ -11,33 +11,71 @@ var server = new Server(serverConfig);
 var graphdb = new GraphDb("temp", server, dbConfig);
 
 function createVertexes(graphdb, callback) {
-    graphdb.createVertex({ id: 0 }, function(err, rootNode) {
+    graphdb.createClass("parent_of", "E", function(err, clusterId) {
         assert(!err, err);
-
-        graphdb.createVertex({ name: "first node" }, function(err, childNode) {
+        graphdb.createClass("child_of", "E", function(err, clusterId) {
             assert(!err, err);
-
-            graphdb.createEdge(rootNode, childNode, function(err, edge) {
+            graphdb.createVertex({ id: 0 }, function(err, rootNode) {
                 assert(!err, err);
 
-                assert.equal(rootNode["out"][0], edge["@rid"]);
-                assert.equal(childNode["in"][0], edge["@rid"]);
-
-                assert.equal(rootNode["@rid"], edge["out"]);
-                assert.equal(childNode["@rid"], edge["in"]);
-
-                graphdb.createEdge(childNode, rootNode, { label: "child_of" }, function(err, edge) {
+                graphdb.createVertex({ name: "first node" }, function(err, childNode) {
                     assert(!err, err);
-                    graphdb.createEdge(childNode["@rid"], rootNode["@rid"], function(err, edge) {
+                    
+                    if (graphdb.server.manager.serverProtocolVersion < 14){
+                        var sets = { label: "parent_of" };
+                    } else {
+                        //label property is reserved, setting an arbitrary property to avoid creating a lightweight edge
+                        sets = { name: "edge 1" };
+                    }
+
+                    graphdb.createEdge(rootNode, childNode, sets, { "class": "parent_of" }, function(err, edge) {
                         assert(!err, err);
+
+                        if(server.manager.serverProtocolVersion < 14) {
+                            assert.equal(rootNode["out"][0], edge["@rid"]);
+                            assert.equal(childNode["in"][0], edge["@rid"]);
+                        } else {
+                            assert.equal(rootNode["out_parent_of"], edge["@rid"]);
+                            assert.equal(childNode["in_parent_of"], edge["@rid"]);
+                        }
                         
-                        childNode["out"].push(edge["@rid"]);
-                        rootNode["in"].push(edge["@rid"]);
-                        
-                        callback(rootNode, childNode);
+                        assert.equal(rootNode["@rid"], edge["out"]);
+                        assert.equal(childNode["@rid"], edge["in"]);
+
+                        if (graphdb.server.manager.serverProtocolVersion < 14){
+                            var sets = { label: "child_of" };
+                        } else {
+                            //label property is reserved, setting an arbitrary property to avoid creating a lightweight edge
+                            sets = { name: "edge 2" };
+                        }
+
+                        graphdb.createEdge(childNode, rootNode, sets, { "class": "child_of" }, function(err, edge) {
+                            assert(!err, err);
+                            
+                            if (graphdb.server.manager.serverProtocolVersion < 14){
+                                var sets = { };
+                            } else {
+                                //label property is reserved, setting an arbitrary property to avoid creating a lightweight edge
+                                sets = { name: "edge 3" };
+                            }
+                            
+                            graphdb.createEdge(childNode["@rid"], rootNode["@rid"], sets, function(err, edge) {
+                                assert(!err, err);
+                                
+                                if(server.manager.serverProtocolVersion < 14) {
+                                    childNode["out"].push(edge["@rid"]);
+                                    rootNode["in"].push(edge["@rid"]);
+                                } else {
+                                    childNode["out_"] = edge["@rid"];
+                                    rootNode["in_"] = edge["@rid"];
+                                }
+                                
+                                callback(rootNode, childNode);
+                            });
+                        });
+
                     });
                 });
-
             });
         });
     });
@@ -47,10 +85,13 @@ graphdb.open(function(err) {
 
     assert(!err, "Error while opening the database: " + err);
 
-    assert.equal("OGraphVertex", graphdb.getClassByName("OGraphVertex").name);
-    assert.equal("OGraphVertex", graphdb.getClassByName("V").name);
-    assert.equal("OGraphEdge", graphdb.getClassByName("OGraphEdge").name);
-    assert.equal("OGraphEdge", graphdb.getClassByName("E").name);
+    if (server.manager.serverProtocolVersion < 14) {
+        assert.equal("OGraphVertex", graphdb.getClassByName("V").name);
+        assert.equal("OGraphEdge", graphdb.getClassByName("E").name);
+    } else {
+        assert.equal("V", graphdb.getClassByName("V").name);
+        assert.equal("E", graphdb.getClassByName("E").name);
+    }
 
     createVertexes(graphdb, function(rootNode, childNode) {
         graphdb.getOutEdges(rootNode, function(err, outEdges) {

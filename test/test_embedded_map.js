@@ -62,7 +62,7 @@ function edge(srid, drid, hash, options, callback) {
 }
 
 function prepareDatabase(callback) {
-    graphdb.createClass("VNode", "OGraphVertex", function(err) {
+    graphdb.createClass("VNode", "V", function(err) {
         if (err) return callback(err);
 
         graphdb.command("CREATE PROPERTY VNode.name STRING", function(err) {
@@ -74,7 +74,7 @@ function prepareDatabase(callback) {
                 graphdb.command("ALTER PROPERTY VNode.name NOTNULL true", function(err) {
                     if (err) return callback(err);
 
-                    graphdb.createClass("VEdge", "OGraphEdge", function(err) {
+                    graphdb.createClass("VEdge", "E", function(err) {
                         if (err) return callback(err);
 
                         graphdb.command("CREATE PROPERTY VEdge.config EMBEDDEDMAP", function(err) {

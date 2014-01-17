@@ -71,7 +71,7 @@ graphdb.open(function(err) {
 });
 
 function prepareDatabase(callback) {
-    graphdb.createClass("VertexWithMandatoryFields", "OGraphVertex", function(err) {
+    graphdb.createClass("VertexWithMandatoryFields", "V", function(err) {
         if (err) return callback(err);
 
         graphdb.command("ALTER CLASS VertexWithMandatoryFields SHORTNAME VWMF", function(err) {
@@ -80,7 +80,7 @@ function prepareDatabase(callback) {
             graphdb.command("ALTER CLASS VertexWithMandatoryFields OVERSIZE 2", function(err) {
                 if (err) { return callback(err); }
 
-                graphdb.createClass("EdgeWithMandatoryFields", "OGraphEdge", function(err) {
+                graphdb.createClass("EdgeWithMandatoryFields", "E", function(err) {
                     if (err) return callback(err);
 
                     graphdb.command("ALTER CLASS EdgeWithMandatoryFields SHORTNAME EWMF", function(err) {

@@ -14,7 +14,7 @@ graphdb.open(function(err) {
 
     assert(!err, err);
 
-    graphdb.createClass("testSchema", "OGraphVertex", function(err) {
+    graphdb.createClass("testSchema", "V", function(err) {
         assert(!err, err);
 
         graphdb.command("CREATE PROPERTY testSchema.label string", function(err) {
