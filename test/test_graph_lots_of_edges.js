@@ -31,12 +31,20 @@ graphdb.open(function(err) {
                         graphdb.loadRecord(fromVertex["@rid"], function(err, fromVertex) {
                             assert(!err, err);
 
-                            assert.equal(50, fromVertex.out.length);
+                            if (server.manager.serverProtocolVersion < 14) {
+                                assert.equal(50, fromVertex.out.length);
+                            } else {
+                                assert.equal(50, fromVertex.out_.length);
+                            }
 
                             graphdb.command("select from " + fromVertex["@rid"], function(err, results) {
                                 assert(!err, err);
 
-                                assert.equal(50, results[0].out.length);
+                                if (server.manager.serverProtocolVersion < 14) {
+                                    assert.equal(50, results[0].out.length);
+                                } else {
+                                    assert.equal(50, results[0].out_.length);
+                                }
                                 
                                 graphdb.close();
                             });

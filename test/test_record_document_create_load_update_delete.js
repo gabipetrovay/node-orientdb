@@ -106,7 +106,12 @@ db.open(function(err, result) {
 
                                     assert(!err, "Error while deleting record: " + JSON.stringify(err));
 
-                                    assert.equal(1, result.status);
+                                    if (db.server.manager.serverProtocolVersion < 14) {
+                                        assert.equal(1, result.status);
+                                    } else {
+                                        //uncertain at what version this result changed; tested at v1.6.3
+                                        assert.equal(0, result.status);
+                                    }
 
                                     console.log("Deleted record.");
                                     db.command("drop class TestClass", function(err, result) {

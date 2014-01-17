@@ -25,19 +25,26 @@ graphdb.open(function(err) {
 
             assert(!_.isUndefined(vertex2["@rid"]));
 
-            graphdb.createEdge(vertex1, vertex2, { label: "select_flatten" }, function(err, edge) {
+            graphdb.createEdge(vertex1, vertex2, { name: "select_flatten" }, function(err, edge) {
                 assert(!err, err);
 
                 assert(!_.isUndefined(edge["@rid"]));
+                
+                var outProperty = "out";
+                var sqlCommand = "flatten";
+                if (server.manager.serverProtocolVersion >= 14) {
+                    outProperty = "out_";
+                    sqlCommand = "expand";
+                }
 
-                graphdb.command("select flatten(out[label = \"select_flatten\"].in) from V", function(err, results) {
+                graphdb.command("select " + sqlCommand + "(" + outProperty + "[name = \"select_flatten\"].in) from V", function(err, results) {
                     assert(!err, err);
 
                     assert.equal(1, results.length);
                     assert(!_.isUndefined(results[0]["@rid"]));
                     assert(!_.isUndefined(results[0]["@type"]));
 
-                    graphdb.close()
+                    graphdb.close();
                 });
             });
         });
