@@ -1,33 +1,71 @@
 {
-    "name"              : "orientdb",
-    "description"       : "A node.js driver for OrientDB",
-    "keywords"          : ["orientdb", "orient", "driver", "db", "node", "node.js"],
-    "version"           : "1.4.0-alpha.1",
-    "author"            : "Gabriel Petrovay <gabipetrovay@gmail.com>",
-    "contributors"      : [
-        { "name": "Ryan Fields", "email": "ryan.fields@twoleftbeats.com" },
-        { "name": "Federico Fissore", "email": "federico@fissore.org" },
-        { "name": "Navin Parray", "email": "navinparray@gmail.com" }
-    ],
-    "repository"        : {
-        "type"      : "git",
-        "url"       : "http://github.com/gabipetrovay/node-orientdb.git" },
-    "dependencies"   : {
-        "lodash" : "*"
+  "name": "node-orientdb",
+  "description": "A Node.js driver for OrientDB based on binary protocols.",
+  "keywords": [
+    "orientdb",
+    "orient",
+    "driver",
+    "graph",
+    "database",
+    "db",
+    "graphdb",
+    "node",
+    "node.js"
+  ],
+  "version": "1.7.0-6",
+  "author": {
+    "name": "Giraldo Rosales",
+    "email": "giraldo@nitrogenlabs.com"
+  },
+  "contributors": [
+    {
+      "name": "Gabriel Petrovay",
+      "email": "gabipetrovay@gmail.com"
     },
-    "devDependencies"   : {
-        "tap"       : "0.4",
-        "async"       : "*"
+    {
+      "name": "Ryan Fields",
+      "email": "ryan.fields@twoleftbeats.com"
     },
-    "main"              : "./lib/orientdb/index",
-    "directories"       : { "lib" : "./lib/orientdb" },
-    "engines"           : { "node" : ">=0.6.0" },
-    "scripts"           : {
-        "test"          : "node ./node_modules/tap/bin/tap.js ./test/errors/test_* ./test/parser/test_* ./test/test_*"
+    {
+      "name": "Federico Fissore",
+      "email": "federico@fissore.org"
     },
-    "licenses"          : [ {
-        "type"      : "Apache License, Version 2.0",
-        "url"       : "http://www.apache.org/licenses/LICENSE-2.0"
-    } ]
+    {
+      "name": "Navin Parray",
+      "email": "navinparray@gmail.com"
+    },
+    {
+      "name": "Charles Pick",
+      "email": "charles@codemix.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/nitrog7/node-orientdb.git"
+  },
+  "dependencies": {
+    "lodash": "*",
+    "bluebird": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "expect.js": "*"
+  },
+  "main": "./lib/index.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "engines": {
+    "node": ">=0.6.0"
+  },
+  "scripts": {
+    "test": "echo \"\n\nNOTICE: If tests fail, please ensure you've set the correct credentials in test/test-server.json\n\n\"; node ./node_modules/mocha/bin/mocha ./test/index.js ./test/**/*.js ./test/**/**/*.js --reporter=spec"
+  },
+  "licenses": [
+    {
+      "type": "Apache License, Version 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ]
 }
-
