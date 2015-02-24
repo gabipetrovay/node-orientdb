@@ -1,7 +1,10 @@
+> **Warning** This package is no longer maintained and is not compatible with newer versions of OrientDB. You should use the official node.js driver for OrientDB [Oriento](https://github.com/codemix/oriento) which is based on this work.
+
 Introduction
 ========
 
 This is a node.js driver for OrientDB using the OrientDB binary protocol.
+
 
 Installation
 ========
