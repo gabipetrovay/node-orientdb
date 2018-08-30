@@ -22,7 +22,7 @@ npm install
 Versioning
 ==========
 
-In order to make it clearer what OrientDB version is supported we will the following versionning scheme: `x.y.z`, where `x.y` is the the OrientDB major and minor version.
+In order to make it clearer what OrientDB version is supported we will the following versionning scheme: `x.y.z`, where `x.y` is the OrientDB major and minor version.
 
 For example:
 - when OrientDB releases version `1.3.0` we will start publishing versions `1.3.z`
